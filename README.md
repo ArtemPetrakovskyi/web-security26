@@ -9,6 +9,7 @@
 | Лабораторна | Гілка |
 |---|---|
 | 1. Simple web-application | `step-1-web-app` |
+| 2. HTTP-requests | `step-2-http-requests` |
 
 ## Лабораторна 1. Simple web-application
 
@@ -29,3 +30,15 @@
 - `resources/static/index.html` — стартова сторінка.
 
 **Запуск:** запустити `WebSecurity26Application` і відкрити http://localhost:8080 або http://localhost:8080/api/v1/books.
+
+## Лабораторна 2. HTTP-requests
+
+Файл `src/test/http/crud.http` — 5 CRUD-запитів для IntelliJ HTTP Client:
+
+1. GET all books — усі книги;
+2. GET one book — книга з `id` `1`;
+3. CREATE one book — нова книга (`id` генерується автоматично);
+4. UPDATE one book — оновлює книгу з `id` `2`;
+5. DELETE one book — видаляє книгу з `id` `3`.
+
+**Запуск:** запустити застосунок, відкрити `crud.http` і натиснути **Run All** (подвійна зелена стрілка вгорі файлу).
