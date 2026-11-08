@@ -1,0 +1,31 @@
+# web-security26 — Book library REST API
+
+Лабораторні роботи з курсу «Інженерія безпеки веб-додатків».
+
+**Технології:** Java 25, Spring Boot 4.1.1, Maven, Lombok.
+
+Кожна лабораторна лежить в окремій гілці:
+
+| Лабораторна | Гілка |
+|---|---|
+| 1. Simple web-application | `step-1-web-app` |
+
+## Лабораторна 1. Simple web-application
+
+Простий REST-застосунок для керування книгами.
+
+- `model/Book.java` — сутність «Книга»: `id`, `title`, `author`, `year`.
+- `service/BookService.java` — зберігає книги у списку в пам'яті; на старті там 3 книги з `id` `1`, `2`, `3`.
+- `controller/BookController.java` — REST API:
+
+| Метод | Адреса | Що робить |
+|---|---|---|
+| GET | `/api/v1/books` | усі книги |
+| GET | `/api/v1/books/{id}` | одна книга |
+| POST | `/api/v1/books` | створити книгу (JSON у тілі) |
+| PUT | `/api/v1/books` | оновити книгу (`id` у тілі) |
+| DELETE | `/api/v1/books/{id}` | видалити книгу |
+
+- `resources/static/index.html` — стартова сторінка.
+
+**Запуск:** запустити `WebSecurity26Application` і відкрити http://localhost:8080 або http://localhost:8080/api/v1/books.
