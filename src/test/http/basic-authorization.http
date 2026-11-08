@@ -1,16 +1,5 @@
-### 0. Get CSRF token
-# Spring Security enables CSRF protection by default, so POST, PUT and DELETE
-# must send a CSRF token. We take it from the login page and keep it in {{csrf}}.
-GET http://localhost:8080/login
-
-> {%
-    const html = typeof response.body === "string" ? response.body : String(response.body);
-    const match = html.match(/name="_csrf" type="hidden" value="([^"]+)"/);
-    client.global.set("csrf", match ? match[1] : "");
-    client.test("CSRF token received", function () {
-        client.assert(match !== null, "CSRF token was not found on /login page");
-    });
-%}
+# CSRF protection is disabled in SecurityConfig (lab 4),
+# so POST, PUT and DELETE no longer need a CSRF token.
 
 ### 1. GET all books - Happy Path
 GET http://localhost:8080/api/v1/books
@@ -37,7 +26,6 @@ Accept: application/json
 ### 3. CREATE one book - Happy Path
 POST http://localhost:8080/api/v1/books
 Authorization: Basic admin admin
-X-CSRF-TOKEN: {{csrf}}
 Content-Type: application/json
 Accept: application/json
 
@@ -56,7 +44,6 @@ Accept: application/json
 ### 4. UPDATE one book - Happy Path
 PUT http://localhost:8080/api/v1/books
 Authorization: Basic admin admin
-X-CSRF-TOKEN: {{csrf}}
 Content-Type: application/json
 Accept: application/json
 
@@ -76,7 +63,6 @@ Accept: application/json
 ### 5. DELETE one book - Happy Path
 DELETE http://localhost:8080/api/v1/books/3
 Authorization: Basic admin admin
-X-CSRF-TOKEN: {{csrf}}
 
 > {%
     client.test("200 OK", function () {
@@ -109,7 +95,6 @@ Accept: application/json
 ### 8. CREATE one book - Bad credentials
 POST http://localhost:8080/api/v1/books
 Authorization: Basic admin qwerty
-X-CSRF-TOKEN: {{csrf}}
 Content-Type: application/json
 Accept: application/json
 
@@ -128,7 +113,6 @@ Accept: application/json
 ### 9. UPDATE one book - Bad credentials
 PUT http://localhost:8080/api/v1/books
 Authorization: Basic admin qwerty
-X-CSRF-TOKEN: {{csrf}}
 Content-Type: application/json
 Accept: application/json
 
@@ -148,7 +132,6 @@ Accept: application/json
 ### 10. DELETE one book - Bad credentials
 DELETE http://localhost:8080/api/v1/books/1
 Authorization: Basic admin qwerty
-X-CSRF-TOKEN: {{csrf}}
 
 > {%
     client.test("401 Unauthorized", function () {
