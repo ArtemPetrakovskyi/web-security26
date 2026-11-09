@@ -12,6 +12,7 @@
 | 2. HTTP-requests | `step-2-http-requests` |
 | 3. Basic Authorization | `step-3-basic-auth` |
 | 4. CSRF & Audit | `step-4-csrf-audit` |
+| 5. Multi-user | `step-5-multi-user` |
 
 ## Лабораторна 1. Simple web-application
 
@@ -101,3 +102,48 @@
 1. Запустити MongoDB на `localhost:27017`: MongoDB Community Server або `docker compose up -d` (файл `compose.yaml`).
 2. Запустити `WebSecurity26Application`.
 3. Відкрити `src/test/http/csrf-audit.http` і натиснути **Run All**.
+
+## Лабораторна 5. Multi-user
+
+### 1. Користувачі — `config/SecurityConfig.java`, метод `userDetailsService()`
+
+Замість одного користувача з `application.properties` тепер три, вони зберігаються в пам'яті (`InMemoryUserDetailsManager`):
+
+| Логін | Пароль | Роль |
+|---|---|---|
+| `admin` | `admin` | `ADMIN` |
+| `user` | `user` | `USER` |
+| `guest` | `guest` | `GUEST` |
+
+Префікс `{noop}` у паролі означає, що пароль зберігається без шифрування (лише для навчального прикладу). Рядки `spring.security.user.*` з `application.properties` прибрано.
+
+### 2. Права доступу — `config/SecurityConfig.java`, метод `filterChain()`
+
+Правила перевіряються згори донизу, спрацьовує перше, що підходить:
+
+| Адреса | Хто має доступ |
+|---|---|
+| `/`, `/index.html` | усі, навіть без логіна |
+| `GET /api/v1/books/hello/admin` | лише `ADMIN` |
+| `GET /api/v1/books/hello/user` | лише `USER` |
+| `GET /api/v1/books/hello/man` | `USER` або `ADMIN` |
+| `GET /api/v1/books/hello/unknown` | будь-який залогінений користувач |
+| `GET`, `POST`, `PUT /api/v1/books/**` | `USER` або `ADMIN` |
+| `DELETE /api/v1/books/**` | лише `ADMIN` |
+
+Коди відповідей: **401** — неправильний логін чи пароль; **403** — користувач залогінений, але його ролі бракує прав.
+
+Ендпоінти `hello/...` додано в `controller/BookController.java`.
+
+Аудит із лабораторної 4 тепер показує, хто саме змінив книгу: після запитів від `user` у полях `createdBy` і `lastModifiedBy` буде `user`, а не `admin`.
+
+### 3. HTTP-запити — `src/test/http/multi-user.http`
+
+15 запитів, кожен перевіряє очікуваний статус:
+
+- 1–7 — привітання для різних ролей (200 або 403);
+- 8–13 — книги: `guest` не має доступу (403), `user` читає, створює й оновлює (200), але не видаляє (403), `admin` видаляє (200);
+- 14 — неправильний пароль (401);
+- 15 — стартова сторінка без логіна (200).
+
+**Запуск:** MongoDB, `WebSecurity26Application`, потім **Run All** у `multi-user.http`.

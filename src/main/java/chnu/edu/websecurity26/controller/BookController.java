@@ -4,7 +4,7 @@ package chnu.edu.websecurity26.controller;
   @author   Artem Petrakovskyi
   @project   web-security26
   @class  BookController
-  @version  1.0.0
+  @version  1.1.0
   @since 08/11/2026 - 15.20
 */
 
@@ -45,5 +45,27 @@ public class BookController {
     @DeleteMapping("/{id}")
     public void deleteBook(@PathVariable String id) {
         bookService.deleteBook(id);
+    }
+
+    //---------------- greetings for different roles ----------------
+
+    @GetMapping("/hello/admin")
+    public String helloAdmin() {
+        return "Hello, admin!";
+    }
+
+    @GetMapping("/hello/user")
+    public String helloUser() {
+        return "Hello, user!";
+    }
+
+    @GetMapping("/hello/man")
+    public String helloMan() {
+        return "Hello, man!";
+    }
+
+    @GetMapping("/hello/unknown")
+    public String helloUnknown() {
+        return "Hello, unknown!";
     }
 }

@@ -1,0 +1,170 @@
+# Users:  admin/admin (ADMIN),  user/user (USER),  guest/guest (GUEST)
+
+### 1. hello/admin as admin - allowed
+GET http://localhost:8080/api/v1/books/hello/admin
+Authorization: Basic admin admin
+
+> {%
+    client.test("200 OK", function () {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+%}
+
+### 2. hello/admin as user - forbidden
+GET http://localhost:8080/api/v1/books/hello/admin
+Authorization: Basic user user
+
+> {%
+    client.test("403 Forbidden", function () {
+        client.assert(response.status === 403, "Expected 403, got " + response.status);
+    });
+%}
+
+### 3. hello/user as user - allowed
+GET http://localhost:8080/api/v1/books/hello/user
+Authorization: Basic user user
+
+> {%
+    client.test("200 OK", function () {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+%}
+
+### 4. hello/user as admin - forbidden
+GET http://localhost:8080/api/v1/books/hello/user
+Authorization: Basic admin admin
+
+> {%
+    client.test("403 Forbidden", function () {
+        client.assert(response.status === 403, "Expected 403, got " + response.status);
+    });
+%}
+
+### 5. hello/man as user - allowed
+GET http://localhost:8080/api/v1/books/hello/man
+Authorization: Basic user user
+
+> {%
+    client.test("200 OK", function () {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+%}
+
+### 6. hello/man as admin - allowed
+GET http://localhost:8080/api/v1/books/hello/man
+Authorization: Basic admin admin
+
+> {%
+    client.test("200 OK", function () {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+%}
+
+### 7. hello/unknown as guest - allowed (any logged-in user)
+GET http://localhost:8080/api/v1/books/hello/unknown
+Authorization: Basic guest guest
+
+> {%
+    client.test("200 OK", function () {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+%}
+
+### 8. GET all books as guest - forbidden
+GET http://localhost:8080/api/v1/books
+Authorization: Basic guest guest
+Accept: application/json
+
+> {%
+    client.test("403 Forbidden", function () {
+        client.assert(response.status === 403, "Expected 403, got " + response.status);
+    });
+%}
+
+### 9. GET all books as user - allowed
+GET http://localhost:8080/api/v1/books
+Authorization: Basic user user
+Accept: application/json
+
+> {%
+    client.test("200 OK", function () {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+%}
+
+### 10. CREATE one book as user - allowed (audit: createdBy = user)
+POST http://localhost:8080/api/v1/books
+Authorization: Basic user user
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Misto",
+  "author": "Valerian Pidmohylnyi",
+  "year": 1928
+}
+
+> {%
+    client.test("200 OK", function () {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+%}
+
+### 11. UPDATE one book as user - allowed (audit: lastModifiedBy = user)
+PUT http://localhost:8080/api/v1/books
+Authorization: Basic user user
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": "2",
+  "title": "Lisova pisnia (updated by user)",
+  "author": "Lesya Ukrainka",
+  "year": 1911
+}
+
+> {%
+    client.test("200 OK", function () {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+%}
+
+### 12. DELETE one book as user - forbidden (only admin can delete)
+DELETE http://localhost:8080/api/v1/books/1
+Authorization: Basic user user
+
+> {%
+    client.test("403 Forbidden", function () {
+        client.assert(response.status === 403, "Expected 403, got " + response.status);
+    });
+%}
+
+### 13. DELETE one book as admin - allowed
+DELETE http://localhost:8080/api/v1/books/3
+Authorization: Basic admin admin
+
+> {%
+    client.test("200 OK", function () {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+%}
+
+### 14. GET all books with wrong password - unauthorized
+GET http://localhost:8080/api/v1/books
+Authorization: Basic user qwerty
+Accept: application/json
+
+> {%
+    client.test("401 Unauthorized", function () {
+        client.assert(response.status === 401, "Expected 401, got " + response.status);
+    });
+%}
+
+### 15. Start page without login - public
+GET http://localhost:8080/index.html
+
+> {%
+    client.test("200 OK", function () {
+        client.assert(response.status === 200, "Expected 200, got " + response.status);
+    });
+%}
